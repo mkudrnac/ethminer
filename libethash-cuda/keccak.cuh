@@ -1,6 +1,7 @@
 #include "cuda_helper.h"
 
-__device__ __constant__ uint64_t const keccak_round_constants[24] = {
+__device__ __constant__
+uint64_t const keccak_round_constants[24] = {
 	0x0000000000000001ULL, 0x0000000000008082ULL, 0x800000000000808AULL,
 	0x8000000080008000ULL, 0x000000000000808BULL, 0x0000000080000001ULL,
 	0x8000000080008081ULL, 0x8000000000008009ULL, 0x000000000000008AULL,
@@ -25,7 +26,8 @@ uint2 chi(const uint2 a, const uint2 b, const uint2 c) {
 	return a ^ (~b) & c;
 }
 
-__device__ __forceinline__ void keccak_f1600_init(uint2* state)
+__device__ __forceinline__
+void keccak_f1600_init(uint2* state)
 {
 	uint2 s[25];
 	uint2 t[5], u, v;
@@ -336,7 +338,8 @@ __device__ __forceinline__ void keccak_f1600_init(uint2* state)
 	    state[i] = s[i];
 }
 
-__device__ __forceinline__ uint64_t keccak_f1600_final(uint2* state)
+__device__ __forceinline__
+uint64_t keccak_f1600_final(uint2* state)
 {
 	uint2 s[25];
 	uint2 t[5], u, v;
@@ -344,7 +347,7 @@ __device__ __forceinline__ uint64_t keccak_f1600_final(uint2* state)
 	for (int i = 0; i < 12; ++i)
 		s[i] = state[i];
 
-	for (uint32_t i = 12; i < 25; i++)
+	for (uint32_t i = 12; i < 25; ++i)
 	{
 		s[i] = make_uint2(0, 0);
 	}
@@ -464,7 +467,7 @@ __device__ __forceinline__ uint64_t keccak_f1600_final(uint2* state)
 	/* iota: a[0,0] ^= round constant */
 	s[0] ^= vectorize(keccak_round_constants[0]);
 
-	for (int i = 1; i < 23; i++)
+	for (int i = 1; i < 23; ++i)
 	{
 		/* theta: c = a[0,i] ^ a[1,i] ^ .. a[4,i] */
 		t[0] = xor5(s[0], s[5], s[10], s[15], s[20]);
@@ -600,11 +603,12 @@ __device__ __forceinline__ uint64_t keccak_f1600_final(uint2* state)
 	return devectorize(s[0]) ^ keccak_round_constants[23];
 }
 
-__device__ __forceinline__ void SHA3_512(uint2* s) {
-	
+__device__ __forceinline__
+void SHA3_512(uint2* s)
+{
 	uint2 t[5], u, v;
 
-	for (uint32_t i = 8; i < 25; i++)
+	for (uint32_t i = 8; i < 25; ++i)
 	{
 		s[i] = make_uint2(0, 0);
 	}

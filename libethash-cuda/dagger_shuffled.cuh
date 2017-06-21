@@ -4,9 +4,8 @@
 
 #define PARALLEL_HASH 4
 
-__device__ uint64_t compute_hash(
-	uint64_t nonce
-	)
+__device__
+uint64_t compute_hash(uint64_t nonce)
 {
 	// sha3_512(header .. nonce)
 	uint2 state[12];
@@ -16,8 +15,10 @@ __device__ uint64_t compute_hash(
 	keccak_f1600_init(state);
 	
 	// Threads work together in this phase in groups of 8.
-	const int thread_id  = threadIdx.x &  (THREADS_PER_HASH - 1);
-	const int mix_idx    = thread_id & 3;
+	const int thread_id     = threadIdx.x & (THREADS_PER_HASH - 1);
+	const int mix_idx       = thread_id & 3;
+    const int shuffle_idx_1 = mix_idx * 2;
+    const int shuffle_idx_2 = shuffle_idx_1 + 1;
 
 	for (int i = 0; i < THREADS_PER_HASH; i += PARALLEL_HASH)
 	{
@@ -26,21 +27,17 @@ __device__ uint64_t compute_hash(
 		uint32_t init0[PARALLEL_HASH];
 	
 		// share init among threads
-		for (int p = 0; p < PARALLEL_HASH; p++)
+		for (int p = 0; p < PARALLEL_HASH; ++p)
 		{
 			uint2 shuffle[8];
-			for (int j = 0; j < 8; j++) 
+			for (int j = 0; j < 8; ++j)
 			{
 				shuffle[j].x = __shfl(state[j].x, i+p, THREADS_PER_HASH);
 				shuffle[j].y = __shfl(state[j].y, i+p, THREADS_PER_HASH);
 			}
-			switch (mix_idx)
-			{
-				case 0: mix[p] = vectorize2(shuffle[0], shuffle[1]); break;
-				case 1: mix[p] = vectorize2(shuffle[2], shuffle[3]); break;
-				case 2: mix[p] = vectorize2(shuffle[4], shuffle[5]); break;
-				case 3: mix[p] = vectorize2(shuffle[6], shuffle[7]); break;
-			}
+            
+            mix[p] = vectorize2(shuffle[shuffle_idx_1], shuffle[shuffle_idx_2]);
+            
 			init0[p] = __shfl(shuffle[0].x, 0, THREADS_PER_HASH);
 		}
 
@@ -48,22 +45,22 @@ __device__ uint64_t compute_hash(
 		{
 			int t = bfe(a, 2u, 3u);
 
-			for (uint32_t b = 0; b < 4; b++)
+			for (uint32_t b = 0; b < 4; ++b)
 			{
-				for (int p = 0; p < PARALLEL_HASH; p++)
+				for (int p = 0; p < PARALLEL_HASH; ++p)
 				{
 					offset[p] = fnv(init0[p] ^ (a + b), ((uint32_t *)&mix[p])[b]) % d_dag_size;
 					offset[p] = __shfl(offset[p], t, THREADS_PER_HASH);
 				}
 				#pragma unroll
-				for (int p = 0; p < PARALLEL_HASH; p++)
+				for (int p = 0; p < PARALLEL_HASH; ++p)
 				{
 					mix[p] = fnv4(mix[p], d_dag[offset[p]].uint4s[thread_id]);
 				}
 			}
 		}
 
-		for (int p = 0; p < PARALLEL_HASH; p++)
+		for (int p = 0; p < PARALLEL_HASH; ++p)
 		{
 			uint2 shuffle[4];
 			uint32_t thread_mix = fnv_reduce(mix[p]);
@@ -79,7 +76,8 @@ __device__ uint64_t compute_hash(
 			shuffle[3].x = __shfl(thread_mix, 6, THREADS_PER_HASH);
 			shuffle[3].y = __shfl(thread_mix, 7, THREADS_PER_HASH);
 
-			if ((i+p) == thread_id) {
+			if ((i+p) == thread_id)
+            {
 				//move mix into state:
 				state[8] = shuffle[0];
 				state[9] = shuffle[1];

@@ -8,9 +8,8 @@ typedef union {
 } compute_hash_share;
 
 
-__device__ uint64_t compute_hash(
-	uint64_t nonce
-	)
+__device__
+uint64_t compute_hash(uint64_t nonce)
 {
 	// sha3_512(header .. nonce)
 	uint64_t state[25];

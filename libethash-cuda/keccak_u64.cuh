@@ -25,14 +25,15 @@ uint64_t chi(const uint64_t a, const uint64_t b, const uint64_t c) {
 	return a ^ (~b) & c;
 }
 
-__device__ __forceinline__ void keccak_f1600_init(uint64_t * s)
+__device__ __forceinline__
+void keccak_f1600_init(uint64_t * s)
 {
 	uint64_t t[5], u, v;
 
 	devectorize4(d_header.uint4s[0], s[0], s[1]);
 	devectorize4(d_header.uint4s[1], s[2], s[3]);
 
-	for (uint32_t i = 5; i < 25; i++)
+	for (uint32_t i = 5; i < 25; ++i)
 	{
 		s[i] = 0;
 	}
@@ -152,7 +153,7 @@ __device__ __forceinline__ void keccak_f1600_init(uint64_t * s)
 	/* iota: a[0,0] ^= round constant */
 	s[0] ^= keccak_round_constants[0];
 
-	for (int i = 1; i < 23; i++)
+	for (int i = 1; i < 23; ++i)
 	{
 		/* theta: c = a[0,i] ^ a[1,i] ^ .. a[4,i] */
 		t[0] = xor5(s[0] , s[5] , s[10] , s[15] , s[20]);
@@ -328,11 +329,12 @@ __device__ __forceinline__ void keccak_f1600_init(uint64_t * s)
 	s[0] ^= keccak_round_constants[23];
 }
 
-__device__ __forceinline__ uint64_t keccak_f1600_final(uint64_t* s)
+__device__ __forceinline__
+uint64_t keccak_f1600_final(uint64_t* s)
 {
 	uint64_t t[5], u, v;
 
-	for (uint32_t i = 12; i < 25; i++)
+	for (uint32_t i = 12; i < 25; ++i)
 	{
 		s[i] = 0;
 	}
@@ -452,7 +454,7 @@ __device__ __forceinline__ uint64_t keccak_f1600_final(uint64_t* s)
 	/* iota: a[0,0] ^= round constant */
 	s[0] ^= keccak_round_constants[0];
 
-	for (int i = 1; i < 23; i++)
+	for (int i = 1; i < 23; ++i)
 	{
 		/* theta: c = a[0,i] ^ a[1,i] ^ .. a[4,i] */
 		t[0] = xor5(s[0], s[5], s[10], s[15], s[20]);
@@ -588,19 +590,20 @@ __device__ __forceinline__ uint64_t keccak_f1600_final(uint64_t* s)
 	return s[0] ^ keccak_round_constants[23];
 }
 
-__device__ __forceinline__ void SHA3_512(uint2* s2) {
-
+__device__ __forceinline__
+void SHA3_512(uint2* s2)
+{
 	uint64_t * s = (uint64_t*)s2; //dirty
 
 	uint64_t t[5], u, v;
 
-	for (uint32_t i = 9; i < 25; i++)
+	for (uint32_t i = 9; i < 25; ++i)
 	{
 		s[i] = 0;
 	}
 	s[8] = 0x8000000000000001;
 
-	for (int i = 0; i < 23; i++)
+	for (int i = 0; i < 23; ++i)
 	{
 		/* theta: c = a[0,i] ^ a[1,i] ^ .. a[4,i] */
 		t[0] = xor5(s[0], s[5], s[10], s[15], s[20]);

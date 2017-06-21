@@ -187,7 +187,7 @@ void EthashCUDAMiner::workLoop()
 				if (s_dagLoadIndex >= s_numInstances && s_dagInHostMemory)
 				{
 					// all devices have loaded DAG, we can free now
-					delete[] s_dagInHostMemory;
+					free((void*)s_dagInHostMemory);
 					s_dagInHostMemory = NULL;
 
 					cout << "Freeing DAG from host" << endl;
@@ -196,7 +196,7 @@ void EthashCUDAMiner::workLoop()
 		}
 
 		uint64_t upper64OfBoundary = (uint64_t)(u64)((u256)w.boundary >> 192);
-		uint64_t startN;
+		uint64_t startN = 0;
 		if (w.exSizeBits >= 0)
 			startN = w.startNonce | ((uint64_t)index() << (64 - 4 - w.exSizeBits)); // this can support up to 16 devices
 		m_miner->search(w.headerHash.data(), upper64OfBoundary, *m_hook, (w.exSizeBits >= 0), startN);
