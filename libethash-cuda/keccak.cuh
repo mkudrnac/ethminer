@@ -13,16 +13,19 @@ uint64_t const keccak_round_constants[24] = {
 };
 
 __device__ __forceinline__
-uint2 xor5(const uint2 a, const uint2 b, const uint2 c, const uint2 d, const uint2 e) {
+uint2 xor5(const uint2 a, const uint2 b, const uint2 c, const uint2 d, const uint2 e)
+{
 	return a ^ b ^ c ^ d ^ e;
 }
 __device__ __forceinline__
-uint2 xor3(const uint2 a, const uint2 b, const uint2 c) {
+uint2 xor3(const uint2 a, const uint2 b, const uint2 c)
+{
 	return a ^ b ^ c;
 }
 
 __device__ __forceinline__
-uint2 chi(const uint2 a, const uint2 b, const uint2 c) {
+uint2 chi(const uint2 a, const uint2 b, const uint2 c)
+{
 	return a ^ (~b) & c;
 }
 
