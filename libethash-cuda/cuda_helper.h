@@ -58,7 +58,6 @@ do {                                                                  \
 /*********************************************************************/
 
 //MARK: 64-bit ROTATE LEFT
-#if __CUDA_ARCH__ >= 350
 __device__ __forceinline__
 uint64_t ROTL64(const uint64_t value, const int offset)
 {
@@ -75,7 +74,6 @@ uint64_t ROTL64(const uint64_t value, const int offset)
 	}
 	return  __double_as_longlong(__hiloint2double(result.y, result.x));
 }
-#endif
 
 //MARK: vectorize/devectorize
 __device__ __forceinline__
@@ -288,8 +286,7 @@ uint4 operator*(uint4 a, uint32_t b)
     return make_uint4(a.x * b, a.y * b, a.z * b,  a.w * b);
 }
 
-//MARK used by keccak
-#if  __CUDA_ARCH__ >= 350
+//MARK: used by keccak
 __device__ __forceinline__
 uint2 ROL2(const uint2 a, const int offset)
 {
@@ -306,25 +303,6 @@ uint2 ROL2(const uint2 a, const int offset)
 	}
 	return result;
 }
-#else
-__device__ __forceinline__
-uint2 ROL2(const uint2 v, const int n)
-{
-    uint2 result;
-    if (n <= 32) 
-    {
-        result.y = ((v.y << (n)) | (v.x >> (32 - n)));
-        result.x = ((v.x << (n)) | (v.y >> (32 - n)));
-    }
-    else 
-    {
-        result.y = ((v.x << (n - 32)) | (v.y >> (64 - n)));
-        result.x = ((v.y << (n - 32)) | (v.x >> (64 - n)));
-
-    }
-    return result;
-}
-#endif
 
 __device__ __forceinline__
 uint32_t bfe(const uint32_t x, const uint32_t bit, const uint32_t numBits)
