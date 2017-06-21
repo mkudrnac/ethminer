@@ -220,7 +220,7 @@ protected:
 	static unsigned s_dagLoadMode;
 	static volatile unsigned s_dagLoadIndex;
 	static unsigned s_dagCreateDevice;
-	static volatile void* s_dagInHostMemory;
+	static volatile uint8_t* s_dagInHostMemory;
 private:
 	FarmFace* m_farm = nullptr;
 	unsigned m_index;
