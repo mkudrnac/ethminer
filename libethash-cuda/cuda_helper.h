@@ -8,7 +8,7 @@
 //MARK: common functions
 extern void cudaReportHardwareFailure(int thr_id, cudaError_t error, const char* func);
 
-//MARK: swap64
+//MARK: swab64
 // Input:       77665544 33221100
 // Output:      00112233 44556677
 __device__ __forceinline__
@@ -61,7 +61,7 @@ __device__ __forceinline__
 uint2 ROL2(const uint2 a, const int offset)
 {
     uint2 result;
-    if (offset >= 32)
+    if(offset >= 32)
     {
         asm("shf.l.wrap.b32 %0, %1, %2, %3;" : "=r"(result.x) : "r"(a.x), "r"(a.y), "r"(offset));
         asm("shf.l.wrap.b32 %0, %1, %2, %3;" : "=r"(result.y) : "r"(a.y), "r"(a.x), "r"(offset));
@@ -72,24 +72,6 @@ uint2 ROL2(const uint2 a, const int offset)
         asm("shf.l.wrap.b32 %0, %1, %2, %3;" : "=r"(result.y) : "r"(a.x), "r"(a.y), "r"(offset));
     }
     return result;
-}
-
-//MARK: 64-bit ROTATE LEFT
-__device__ __forceinline__
-uint64_t ROTL64(const uint64_t value, const int offset)
-{
-	uint2 result;
-	if(offset >= 32)
-    {
-		asm("shf.l.wrap.b32 %0, %1, %2, %3;" : "=r"(result.x) : "r"(__double2loint(__longlong_as_double(value))), "r"(__double2hiint(__longlong_as_double(value))), "r"(offset));
-		asm("shf.l.wrap.b32 %0, %1, %2, %3;" : "=r"(result.y) : "r"(__double2hiint(__longlong_as_double(value))), "r"(__double2loint(__longlong_as_double(value))), "r"(offset));
-	}
-    else
-    {
-		asm("shf.l.wrap.b32 %0, %1, %2, %3;" : "=r"(result.x) : "r"(__double2hiint(__longlong_as_double(value))), "r"(__double2loint(__longlong_as_double(value))), "r"(offset));
-		asm("shf.l.wrap.b32 %0, %1, %2, %3;" : "=r"(result.y) : "r"(__double2loint(__longlong_as_double(value))), "r"(__double2hiint(__longlong_as_double(value))), "r"(offset));
-	}
-	return  __double_as_longlong(__hiloint2double(result.y, result.x));
 }
 
 //MARK: vectorize/devectorize

@@ -40,7 +40,7 @@ void keccak_f1600_init(uint2* state)
 	devectorize2(d_header.uint4s[0], s[0], s[1]);
 	devectorize2(d_header.uint4s[1], s[2], s[3]);
 
-	for (uint32_t i = 5; i < 25; i++)
+	for (uint32_t i = 5; i < 25; ++i)
 	{
 		s[i] = make_uint2(0, 0);
 	}
@@ -338,7 +338,9 @@ void keccak_f1600_init(uint2* state)
 	s[0] ^= vectorize(keccak_round_constants[23]);
 
 	for(int i = 0; i < 12; ++i)
+    {
 	    state[i] = s[i];
+    }
 }
 
 __device__ __forceinline__
