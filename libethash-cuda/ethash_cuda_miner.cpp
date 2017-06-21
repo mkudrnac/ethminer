@@ -268,8 +268,7 @@ bool ethash_cuda_miner::init(ethash_light_t _light, uint8_t const* _lightData, u
 		m_current_target = 0;
 		m_current_nonce = 0;
 		m_current_index = 0;
-
-		m_sharedBytes = device_props.major * 100 < SHUFFLE_MIN_VER ? (64 * s_blockSize) / 8 : 0 ;
+		m_sharedBytes = 0;
 
 		if (!*hostDAG)
 		{
