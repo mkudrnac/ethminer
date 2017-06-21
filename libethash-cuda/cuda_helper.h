@@ -3,57 +3,10 @@
 
 #include <cuda.h>
 #include <cuda_runtime.h>
-
-#ifdef __INTELLISENSE__
-/* reduce vstudio warnings (__byteperm, blockIdx...) */
-#include <device_functions.h>
-#include <device_launch_parameters.h>
-#define __launch_bounds__(max_tpb, min_blocks)
-#define asm("a" : "=l"(result) : "l"(a))
-#define __CUDA_ARCH__ 520 // highlight shuffle code by default.
-
-uint32_t __byte_perm(uint32_t x, uint32_t y, uint32_t z);
-uint32_t __shfl(uint32_t x, uint32_t y, uint32_t z);
-uint32_t atomicExch(uint32_t *x, uint32_t y);
-uint32_t atomicAdd(uint32_t *x, uint32_t y);
-void __syncthreads(void);
-void __threadfence(void);
-void __threadfence_block(void);
-
-uint32_t __byte_perm(uint32_t x, uint32_t y, uint32_t z);
-uint32_t __shfl(uint32_t x, uint32_t y, uint32_t z);
-uint32_t atomicExch(uint32_t *x, uint32_t y);
-uint32_t atomicAdd(uint32_t *x, uint32_t y);
-void __syncthreads(void);
-void __threadfence(void);
-#endif
-
 #include <stdint.h>
 
-#ifndef MAX_GPUS
-#define MAX_GPUS 32
-#endif
-
-extern "C" int device_map[MAX_GPUS];
-extern "C"  long device_sm[MAX_GPUS];
-extern cudaStream_t gpustream[MAX_GPUS];
-
-// common functions
-extern void cuda_check_cpu_init(int thr_id, uint32_t threads);
-extern void cuda_check_cpu_setTarget(const void *ptarget);
-extern void cuda_check_cpu_setTarget_mod(const void *ptarget, const void *ptarget2);
-extern uint32_t cuda_check_hash(int thr_id, uint32_t threads, uint32_t startNounce, uint32_t *d_inputHash);
-extern uint32_t cuda_check_hash_suppl(int thr_id, uint32_t threads, uint32_t startNounce, uint32_t *d_inputHash, uint32_t foundnonce);
+//MARK: common functions
 extern void cudaReportHardwareFailure(int thr_id, cudaError_t error, const char* func);
-
-#ifndef __CUDA_ARCH__
-// define blockDim and threadIdx for host
-extern const dim3 blockDim;
-extern const uint3 threadIdx;
-#endif
-
-extern cudaError_t MyStreamSynchronize(cudaStream_t stream, int situation, int thr_id);
-
 
 #ifndef SPH_C32
 #define SPH_C32(x) ((x ## U))
@@ -97,7 +50,6 @@ uint32_t ROTR32(const uint32_t x, const uint32_t n)
 	return(__funnelshift_r((x), (x), (n)));
 }
 #endif
-
 
 __device__ __forceinline__
 uint64_t MAKE_ULONGLONG(uint32_t LO, uint32_t HI)
@@ -150,7 +102,6 @@ uint32_t cuda_swab32(const uint32_t x)
 	((((x) << 24) & 0xff000000u) | (((x) << 8) & 0x00ff0000u) | \
 		(((x) >> 8) & 0x0000ff00u) | (((x) >> 24) & 0x000000ffu))
 #endif
-
 
 __device__ __forceinline__
 uint32_t _HIWORD(const uint64_t x)
@@ -391,10 +342,13 @@ __device__ __forceinline__
 uint64_t ROTL64(const uint64_t value, const int offset)
 {
 	uint2 result;
-	if(offset >= 32) {
+	if(offset >= 32)
+    {
 		asm("shf.l.wrap.b32 %0, %1, %2, %3;" : "=r"(result.x) : "r"(__double2loint(__longlong_as_double(value))), "r"(__double2hiint(__longlong_as_double(value))), "r"(offset));
 		asm("shf.l.wrap.b32 %0, %1, %2, %3;" : "=r"(result.y) : "r"(__double2hiint(__longlong_as_double(value))), "r"(__double2loint(__longlong_as_double(value))), "r"(offset));
-	} else {
+	}
+    else
+    {
 		asm("shf.l.wrap.b32 %0, %1, %2, %3;" : "=r"(result.x) : "r"(__double2hiint(__longlong_as_double(value))), "r"(__double2loint(__longlong_as_double(value))), "r"(offset));
 		asm("shf.l.wrap.b32 %0, %1, %2, %3;" : "=r"(result.y) : "r"(__double2loint(__longlong_as_double(value))), "r"(__double2hiint(__longlong_as_double(value))), "r"(offset));
 	}
@@ -462,7 +416,8 @@ void LOHI(uint32_t &lo, uint32_t &hi, uint64_t x)
 		: "=r"(lo), "=r"(hi) : "l"(x));
 }
 
-__device__ __forceinline__ uint64_t devectorize(uint2 x)
+__device__ __forceinline__
+uint64_t devectorize(uint2 x)
 {
 	uint64_t result;
 	asm("mov.b64 %0,{%1,%2}; \n\t"
@@ -471,7 +426,8 @@ __device__ __forceinline__ uint64_t devectorize(uint2 x)
 }
 
 
-__device__ __forceinline__ uint2 vectorize(const uint64_t x)
+__device__ __forceinline__
+uint2 vectorize(const uint64_t x)
 {
 	uint2 result;
 	asm("mov.b64 {%0,%1},%2; \n\t"
@@ -487,7 +443,6 @@ void devectorize2(uint4 inn, uint2 &x, uint2 &y)
 	y.x = inn.z;
 	y.y = inn.w;
 }
-
 
 __device__ __forceinline__
 uint4 vectorize2(uint2 x, uint2 y)

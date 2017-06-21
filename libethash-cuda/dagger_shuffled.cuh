@@ -52,6 +52,7 @@ uint64_t compute_hash(uint64_t nonce)
 					offset[p] = fnv(init0[p] ^ (a + b), ((uint32_t *)&mix[p])[b]) % d_dag_size;
 					offset[p] = __shfl(offset[p], t, THREADS_PER_HASH);
 				}
+                
 				#pragma unroll
 				for (int p = 0; p < PARALLEL_HASH; ++p)
 				{
