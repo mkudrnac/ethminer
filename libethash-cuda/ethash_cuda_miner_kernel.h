@@ -26,9 +26,9 @@ typedef union {
 } hash64_t;
 
 typedef union {
-	uint32_t words[200 / sizeof(uint32_t)];
-	uint2	 uint2s[200 / sizeof(uint2)];
-	uint4	 uint4s[200 / sizeof(uint4)];
+	uint32_t words[256 / sizeof(uint32_t)];
+	uint2	 uint2s[256 / sizeof(uint2)];
+	uint4	 uint4s[256 / sizeof(uint4)];
 } hash200_t;
 
 void set_constants(
