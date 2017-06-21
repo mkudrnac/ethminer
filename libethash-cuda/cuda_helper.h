@@ -696,7 +696,7 @@ uint4 operator^ (uint4 a, uint2 b)
 }
 
 __device__ __forceinline__
-uint4 operator*(uint4 a, uint b)
+uint4 operator*(uint4 a, uint32_t b)
 {
     return make_uint4(a.x * b, a.y * b, a.z * b,  a.w * b);
 }

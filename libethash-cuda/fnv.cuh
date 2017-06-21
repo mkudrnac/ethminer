@@ -14,12 +14,7 @@ const uint32_t fnv(const uint32_t x, const uint32_t y)
 __device__ __forceinline__
 const uint4 fnv4(const uint4 a, const uint4 b)
 {
-	uint4 c;
-	c.x = a.x * FNV_PRIME ^ b.x;
-	c.y = a.y * FNV_PRIME ^ b.y;
-	c.z = a.z * FNV_PRIME ^ b.z;
-	c.w = a.w * FNV_PRIME ^ b.w;
-	return c;
+    return x * FNV_PRIME ^ y;
 }
 
 __device__ __forceinline__
