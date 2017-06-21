@@ -1,6 +1,6 @@
 find_package(CUDA REQUIRED)
 
-set(CUDA_NVCC_FLAGS ${CUDA_NVCC_FLAGS};--ptxas-options=-v;-use_fast_math;-lineinfo;-std=c++11)
+set(CUDA_NVCC_FLAGS ${CUDA_NVCC_FLAGS};--disable-warnings;--ptxas-options=-v;-use_fast_math;-lineinfo;-std=c++11)
 
 list(APPEND CUDA_NVCC_FLAGS_RELEASE -O3)
 list(APPEND CUDA_NVCC_FLAGS_DEBUG -G)
