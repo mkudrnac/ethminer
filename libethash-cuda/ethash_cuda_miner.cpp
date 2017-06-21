@@ -278,11 +278,11 @@ bool ethash_cuda_miner::init(ethash_light_t _light, uint8_t const* _lightData, u
 
 			if (_cpyToHost)
 			{
-				void* memoryDAG = malloc(dagSize);
+				uint8_t* memoryDAG = new uint8_t[dagSize];
 				cout << "Copying DAG from GPU #" << device_num << " to host" << endl;
-				CUDA_SAFE_CALL(cudaMemcpy(memoryDAG, dag, dagSize, cudaMemcpyDeviceToHost));
-                
-				*hostDAG = memoryDAG;
+				CUDA_SAFE_CALL(cudaMemcpy(reinterpret_cast<void*>(memoryDAG), dag, dagSize, cudaMemcpyDeviceToHost));
+
+				*hostDAG = (void*)memoryDAG;
 			}
 		}
 		else
