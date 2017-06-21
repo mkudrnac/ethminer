@@ -1,10 +1,18 @@
+/*
+ *  https://en.wikipedia.org/wiki/Fowler–Noll–Vo_hash_function
+ */
+
 
 #define FNV_PRIME	0x01000193
 
-#define fnv(x,y) ((x) * FNV_PRIME ^(y))
+__device__ __forceinline__
+const uint32_t fnv(const uint32_t x, const uint32_t y) const
+{
+    return x * FNV_PRIME ^ y;
+}
 
 __device__ __forceinline__
-uint4 fnv4(uint4 a, uint4 b)
+const uint4 fnv4(const uint4 a, const uint4 b) const
 {
 	uint4 c;
 	c.x = a.x * FNV_PRIME ^ b.x;
@@ -15,8 +23,7 @@ uint4 fnv4(uint4 a, uint4 b)
 }
 
 __device__ __forceinline__
-uint32_t fnv_reduce(uint4 v)
+const uint32_t fnv_reduce(uint4 v) const 
 {
 	return fnv(fnv(fnv(v.x, v.y), v.z), v.w);
 }
-
