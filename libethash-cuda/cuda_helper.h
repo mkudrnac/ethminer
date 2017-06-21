@@ -57,7 +57,6 @@ do {                                                                  \
 /*********************************************************************/
 
 //MARK: uint2 ROTATE LEFT
-#if __CUDA_ARCH__ >= 350
 __device__ __forceinline__
 uint2 ROL2(const uint2 a, const int offset)
 {
@@ -74,10 +73,8 @@ uint2 ROL2(const uint2 a, const int offset)
     }
     return result;
 }
-#endif
 
 //MARK: 64-bit ROTATE LEFT
-#if __CUDA_ARCH__ >= 350
 __device__ __forceinline__
 uint64_t ROTL64(const uint64_t value, const int offset)
 {
@@ -94,7 +91,6 @@ uint64_t ROTL64(const uint64_t value, const int offset)
 	}
 	return  __double_as_longlong(__hiloint2double(result.y, result.x));
 }
-#endif
 
 //MARK: vectorize/devectorize
 __device__ __forceinline__
