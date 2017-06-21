@@ -21,5 +21,5 @@ uint4 fnv4(const uint4 x, const uint4 y)
 __device__ __forceinline__
 uint32_t fnv_reduce(const uint4 v)
 {
-	return fnv(fnv(fnv(v.x, v.y), v.z), v.w);
+    return fnv(fnv(fnv(v.x, v.y), v.z), v.w);
 }

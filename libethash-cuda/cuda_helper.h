@@ -8,7 +8,6 @@
 //MARK: common functions
 extern void cudaReportHardwareFailure(int thr_id, cudaError_t error, const char* func);
 
-
 //MARK: swap64
 // Input:       77665544 33221100
 // Output:      00112233 44556677
@@ -57,7 +56,28 @@ do {                                                                  \
 
 /*********************************************************************/
 
+//MARK: uint2 ROTATE LEFT
+#if __CUDA_ARCH__ >= 350
+__device__ __forceinline__
+uint2 ROL2(const uint2 a, const int offset)
+{
+    uint2 result;
+    if (offset >= 32)
+    {
+        asm("shf.l.wrap.b32 %0, %1, %2, %3;" : "=r"(result.x) : "r"(a.x), "r"(a.y), "r"(offset));
+        asm("shf.l.wrap.b32 %0, %1, %2, %3;" : "=r"(result.y) : "r"(a.y), "r"(a.x), "r"(offset));
+    }
+    else
+    {
+        asm("shf.l.wrap.b32 %0, %1, %2, %3;" : "=r"(result.x) : "r"(a.y), "r"(a.x), "r"(offset));
+        asm("shf.l.wrap.b32 %0, %1, %2, %3;" : "=r"(result.y) : "r"(a.x), "r"(a.y), "r"(offset));
+    }
+    return result;
+}
+#endif
+
 //MARK: 64-bit ROTATE LEFT
+#if __CUDA_ARCH__ >= 350
 __device__ __forceinline__
 uint64_t ROTL64(const uint64_t value, const int offset)
 {
@@ -74,6 +94,7 @@ uint64_t ROTL64(const uint64_t value, const int offset)
 	}
 	return  __double_as_longlong(__hiloint2double(result.y, result.x));
 }
+#endif
 
 //MARK: vectorize/devectorize
 __device__ __forceinline__
@@ -286,24 +307,7 @@ uint4 operator*(uint4 a, uint32_t b)
     return make_uint4(a.x * b, a.y * b, a.z * b,  a.w * b);
 }
 
-//MARK: used by keccak
-__device__ __forceinline__
-uint2 ROL2(const uint2 a, const int offset)
-{
-	uint2 result;
-	if (offset >= 32)
-    {
-		asm("shf.l.wrap.b32 %0, %1, %2, %3;" : "=r"(result.x) : "r"(a.x), "r"(a.y), "r"(offset));
-		asm("shf.l.wrap.b32 %0, %1, %2, %3;" : "=r"(result.y) : "r"(a.y), "r"(a.x), "r"(offset));
-	}
-	else
-    {
-		asm("shf.l.wrap.b32 %0, %1, %2, %3;" : "=r"(result.x) : "r"(a.y), "r"(a.x), "r"(offset));
-		asm("shf.l.wrap.b32 %0, %1, %2, %3;" : "=r"(result.y) : "r"(a.x), "r"(a.y), "r"(offset));
-	}
-	return result;
-}
-
+//MARK: misc
 __device__ __forceinline__
 uint32_t bfe(const uint32_t x, const uint32_t bit, const uint32_t numBits)
 {
