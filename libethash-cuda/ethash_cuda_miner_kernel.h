@@ -7,7 +7,7 @@
 
 #define SEARCH_RESULT_BUFFER_SIZE 64
 #define ACCESSES 64
-#define THREADS_PER_HASH (64 / 16)
+#define THREADS_PER_HASH (128 / 16)
 
 typedef struct
 {
