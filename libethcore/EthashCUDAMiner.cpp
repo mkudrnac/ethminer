@@ -108,9 +108,9 @@ unsigned EthashCUDAMiner::s_numInstances = 0;
 int EthashCUDAMiner::s_devices[16] = { -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 };
 
 EthashCUDAMiner::EthashCUDAMiner(ConstructionInfo const& _ci) :
-	Miner(_ci),
-	Worker("cudaminer" + toString(index())),
-m_hook( new EthashCUDAHook(this))
+Miner(_ci),
+Worker("cudaminer" + toString(index())),
+m_hook(new EthashCUDAHook(this))
 {
 }
 
@@ -148,7 +148,8 @@ void EthashCUDAMiner::workLoop()
 
 			if (s_dagLoadMode == DAG_LOAD_MODE_SEQUENTIAL)
 			{
-				while (s_dagLoadIndex < index()) {
+				while (s_dagLoadIndex < index())
+                {
 					this_thread::sleep_for(chrono::seconds(1));
 				}
 			}
@@ -157,7 +158,8 @@ void EthashCUDAMiner::workLoop()
 				if (device != s_dagCreateDevice)
 				{
 					// wait until DAG is created on selected device
-					while (s_dagInHostMemory == NULL) {
+					while (s_dagInHostMemory == NULL)
+                    {
 						this_thread::sleep_for(chrono::seconds(1));
 					}
 				}
@@ -172,7 +174,7 @@ void EthashCUDAMiner::workLoop()
 			m_minerSeed = w.seedHash;
 
 			delete m_miner;
-			m_miner = new ethash_cuda_miner;
+			m_miner = new ethash_cuda_miner();
 
 			EthashAux::LightType light;
 			light = EthashAux::light(w.seedHash);
