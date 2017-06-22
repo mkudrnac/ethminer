@@ -2,7 +2,7 @@
  *  https://en.wikipedia.org/wiki/Fowler–Noll–Vo_hash_function
  */
 
-#include "cuda_helper.h"
+#include "cuda_helper.cuh"
 
 #define FNV_PRIME	0x01000193
 

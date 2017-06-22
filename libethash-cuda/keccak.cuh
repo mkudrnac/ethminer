@@ -1,4 +1,4 @@
-#include "cuda_helper.h"
+#include "cuda_helper.cuh"
 
 __device__ __constant__
 uint64_t const keccak_round_constants[24] = {
