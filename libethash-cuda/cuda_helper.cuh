@@ -23,25 +23,25 @@ uint64_t cuda_swab64(uint64_t x)
 
 //MARK: uint2 ROTATE LEFT
 __device__ __forceinline__
-uint2 ROL2(const uint2 a, const int offset)
+uint2 ROL2(uint2 a, unsigned int shift)
 {
     uint2 result;
     if(offset >= 32)
-    {        
-        asm("shf.l.wrap.b32 %0, %1, %2, %3;" : "=r"(result.x) : "r"(a.x), "r"(a.y), "r"(offset));
-        asm("shf.l.wrap.b32 %0, %1, %2, %3;" : "=r"(result.y) : "r"(a.y), "r"(a.x), "r"(offset));
+    {
+        result.x = __funnelshift_l(a.x, a.y, shift);
+        result.y = __funnelshift_l(a.y, a.x, shift);
     }
     else
     {
-        asm("shf.l.wrap.b32 %0, %1, %2, %3;" : "=r"(result.x) : "r"(a.y), "r"(a.x), "r"(offset));
-        asm("shf.l.wrap.b32 %0, %1, %2, %3;" : "=r"(result.y) : "r"(a.x), "r"(a.y), "r"(offset));
+        result.x = __funnelshift_l(a.y, a.x, shift);
+        result.y = __funnelshift_l(a.x, a.y, shift);
     }
     return result;
 }
 
 //MARK: vectorize/devectorize
 __device__ __forceinline__
-uint64_t devectorize(const uint2 x)
+uint64_t devectorize(uint2 x)
 {
 	uint64_t result;
 	asm("mov.b64 %0,{%1,%2}; \n\t"
@@ -50,7 +50,7 @@ uint64_t devectorize(const uint2 x)
 }
 
 __device__ __forceinline__
-uint2 vectorize(const uint64_t x)
+uint2 vectorize(uint64_t x)
 {
 	uint2 result;
 	asm("mov.b64 {%0,%1},%2; \n\t"
@@ -59,7 +59,7 @@ uint2 vectorize(const uint64_t x)
 }
 
 __device__ __forceinline__
-void devectorize2(const uint4 inn, uint2 &x, uint2 &y)
+void devectorize2(uint4 inn, uint2 &x, uint2 &y)
 {
 	x.x = inn.x;
 	x.y = inn.y;
@@ -68,7 +68,7 @@ void devectorize2(const uint4 inn, uint2 &x, uint2 &y)
 }
 
 __device__ __forceinline__
-uint4 vectorize2(const uint2 x, const uint2 y)
+uint4 vectorize2(uint2 x, const uint2 y)
 {
 	uint4 result;
 	result.x = x.x;
@@ -79,7 +79,7 @@ uint4 vectorize2(const uint2 x, const uint2 y)
 }
 
 __device__ __forceinline__
-uint4 vectorize2(const uint2 x)
+uint4 vectorize2(uint2 x)
 {
 	uint4 result;
 	result.x = x.x;
@@ -90,7 +90,7 @@ uint4 vectorize2(const uint2 x)
 }
 
 __device__ __forceinline__
-void devectorize4(const uint4 inn, uint64_t &x, uint64_t &y)
+void devectorize4(uint4 inn, uint64_t &x, uint64_t &y)
 {
 	asm("mov.b64 %0,{%1,%2}; \n\t"
 		: "=l"(x) : "r"(inn.x), "r"(inn.y));
@@ -252,7 +252,7 @@ uint4 operator*(uint4 a, uint32_t b)
 
 //MARK: misc
 __device__ __forceinline__
-uint32_t bfe(const uint32_t x, const uint32_t bit, const uint32_t numBits)
+uint32_t bfe(uint32_t x, uint32_t bit, uint32_t numBits)
 {
 	uint32_t ret;
 	asm("bfe.u32 %0, %1, %2, %3;" : "=r"(ret) : "r"(x), "r"(bit), "r"(numBits));
