@@ -10,17 +10,15 @@
 __device__ __forceinline__
 uint64_t cuda_swab64(uint64_t x)
 {
-    return __brevll(x);
-    
-//	uint64_t result;
-//	uint2 t;
-//	asm("mov.b64 {%0,%1},%2; \n\t"
-//		: "=r"(t.x), "=r"(t.y) : "l"(x));
-//	t.x = __byte_perm(t.x, 0, 0x0123);
-//	t.y = __byte_perm(t.y, 0, 0x0123);
-//	asm("mov.b64 %0,{%1,%2}; \n\t"
-//		: "=l"(result) : "r"(t.y), "r"(t.x));
-//	return result;
+	uint64_t result;
+	uint2 t;
+	asm("mov.b64 {%0,%1},%2; \n\t"
+		: "=r"(t.x), "=r"(t.y) : "l"(x));
+	t.x = __byte_perm(t.x, 0, 0x0123);
+	t.y = __byte_perm(t.y, 0, 0x0123);
+	asm("mov.b64 %0,{%1,%2}; \n\t"
+		: "=l"(result) : "r"(t.y), "r"(t.x));
+	return result;
 }
 
 //MARK: uint2 ROTATE LEFT
