@@ -705,9 +705,11 @@ private:
 			f.onSolutionFound([&](Solution sol)
 			{
 				solution = sol;
-				return completed = true;
+                completed = true;
+				return true;
 			});
-			for (unsigned i = 0; !completed; ++i)
+            
+			while (!completed;)
 			{
 				auto mp = f.miningProgress();
 				f.resetMiningProgress();
@@ -716,6 +718,7 @@ private:
 				this_thread::sleep_for(chrono::milliseconds(1000));
 				time++;
 			}
+            
 			cnote << "Difficulty:" << difficulty << "  Nonce:" << solution.nonce.hex();
 			if (EthashAux::eval(current.seedHash, current.headerHash, solution.nonce).value < current.boundary)
 			{
@@ -786,9 +789,11 @@ private:
 				f.onSolutionFound([&](Solution sol)
 				{
 					solution = sol;
-					return completed = true;
+                    completed = true;
+					return true;
 				});
-				for (unsigned i = 0; !completed; ++i)
+                
+				while(!completed)
 				{
 					auto mp = f.miningProgress();
 					f.resetMiningProgress();
@@ -828,6 +833,7 @@ private:
 					}
 					this_thread::sleep_for(chrono::milliseconds(_recheckPeriod));
 				}
+                
 				cnote << "Solution found; Submitting to" << _remote << "...";
 				cnote << "  Nonce:" << solution.nonce.hex();
 				if (EthashAux::eval(current.seedHash, current.headerHash, solution.nonce).value < current.boundary)
