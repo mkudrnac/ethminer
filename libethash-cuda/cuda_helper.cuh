@@ -26,7 +26,7 @@ __device__ __forceinline__
 uint2 ROL2(uint2 a, unsigned int shift)
 {
     uint2 result;
-    if(offset >= 32)
+    if(shift >= 32)
     {
         result.x = __funnelshift_l(a.x, a.y, shift);
         result.y = __funnelshift_l(a.y, a.x, shift);
