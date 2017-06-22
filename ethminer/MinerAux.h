@@ -709,7 +709,7 @@ private:
 				return true;
 			});
             
-			while (!completed;)
+			while(!completed)
 			{
 				auto mp = f.miningProgress();
 				f.resetMiningProgress();
