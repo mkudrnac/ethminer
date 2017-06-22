@@ -5,8 +5,8 @@
 */
 
 #include "ethash_cuda_miner_kernel.h"
-#include "ethash_cuda_miner_kernel_globals.h"
 
+#include "ethash_cuda_miner_kernel_globals.cuh"
 #include "cuda_helper.cuh"
 #include "fnv.cuh"
 #include "keccak.cuh"

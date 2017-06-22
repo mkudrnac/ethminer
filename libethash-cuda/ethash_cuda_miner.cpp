@@ -35,7 +35,6 @@
 #include <libethash/internal.h>
 #include <cuda_runtime.h>
 #include "ethash_cuda_miner.h"
-#include "ethash_cuda_miner_kernel_globals.h"
 
 
 // workaround lame platforms
