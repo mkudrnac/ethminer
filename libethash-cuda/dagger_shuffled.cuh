@@ -78,8 +78,6 @@
 
 
 
-
-
 #define PARALLEL_HASH 4
 
 __device__
