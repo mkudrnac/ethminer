@@ -37,7 +37,7 @@ void keccak_f1600_init(uint2* s)
 	devectorize2(d_header.uint4s[0], s[0], s[1]);
 	devectorize2(d_header.uint4s[1], s[2], s[3]);
 
-	for(int i = 5;i < 25; ++i)
+	for(int i = 5;i < 25;++i)
 	{
 		s[i] = make_uint2(0, 0);
 	}
@@ -93,7 +93,6 @@ void keccak_f1600_init(uint2* s)
 
 	/* rho pi: b[..] = rotl(a[..], ..) */
 	u = s[1];
-
 	s[1] = ROL2(s[6], 44);
 	s[6] = ROL2(s[9], 20);
 	s[9] = ROL2(s[22], 61);
@@ -120,7 +119,6 @@ void keccak_f1600_init(uint2* s)
 	s[10] = ROL2(u, 1);
 
 	/* chi: a[i,j] ^= ~b[i,j+1] & b[i,j+2] */
-
 	u = s[0]; v = s[1];
 	s[0] = chi(s[0], s[1], s[2]);
 	s[1] = chi(s[1], s[2], s[3]);
@@ -198,7 +196,6 @@ void keccak_f1600_init(uint2* s)
 		s[13] = xor3(s[13], t[2], u);
 		s[18] = xor3(s[18], t[2], u);
 		s[23] = xor3(s[23], t[2], u);
-
 
 		u = ROL2(t[0], 1);
 		s[4] = xor3(s[4], t[3], u);

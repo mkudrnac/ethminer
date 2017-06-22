@@ -67,7 +67,6 @@ uint64_t compute_hash(uint64_t nonce)
 			uint32_t thread_mix = fnv_reduce(mix[p]);
 
 			// update mix accross threads
-
 			shuffle[0].x = __shfl(thread_mix, 0, THREADS_PER_HASH);
 			shuffle[0].y = __shfl(thread_mix, 1, THREADS_PER_HASH);
 			shuffle[1].x = __shfl(thread_mix, 2, THREADS_PER_HASH);
