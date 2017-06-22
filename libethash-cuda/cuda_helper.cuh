@@ -27,20 +27,14 @@ uint2 ROL2(const uint2 a, const int offset)
 {
     uint2 result;
     if(offset >= 32)
-    {
-        result.x = __funnelshift_lc(a.x, a.y, offset);
-        result.y = __funnelshift_lc(a.y, a.x, offset);
-        
-//        asm("shf.l.wrap.b32 %0, %1, %2, %3;" : "=r"(result.x) : "r"(a.x), "r"(a.y), "r"(offset));
-//        asm("shf.l.wrap.b32 %0, %1, %2, %3;" : "=r"(result.y) : "r"(a.y), "r"(a.x), "r"(offset));
+    {        
+        asm("shf.l.wrap.b32 %0, %1, %2, %3;" : "=r"(result.x) : "r"(a.x), "r"(a.y), "r"(offset));
+        asm("shf.l.wrap.b32 %0, %1, %2, %3;" : "=r"(result.y) : "r"(a.y), "r"(a.x), "r"(offset));
     }
     else
     {
-        result.x = __funnelshift_lc(a.y, a.x, offset);
-        result.y = __funnelshift_lc(a.x, a.y, offset);
-        
-//        asm("shf.l.wrap.b32 %0, %1, %2, %3;" : "=r"(result.x) : "r"(a.y), "r"(a.x), "r"(offset));
-//        asm("shf.l.wrap.b32 %0, %1, %2, %3;" : "=r"(result.y) : "r"(a.x), "r"(a.y), "r"(offset));
+        asm("shf.l.wrap.b32 %0, %1, %2, %3;" : "=r"(result.x) : "r"(a.y), "r"(a.x), "r"(offset));
+        asm("shf.l.wrap.b32 %0, %1, %2, %3;" : "=r"(result.y) : "r"(a.x), "r"(a.y), "r"(offset));
     }
     return result;
 }
