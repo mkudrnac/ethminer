@@ -13,34 +13,31 @@ uint64_t const keccak_round_constants[24] = {
 };
 
 __device__ __forceinline__
-uint2 xor5(const uint2 a, const uint2 b, const uint2 c, const uint2 d, const uint2 e)
+uint2 xor5(uint2 a, uint2 b, uint2 c, uint2 d, uint2 e)
 {
 	return a ^ b ^ c ^ d ^ e;
 }
 __device__ __forceinline__
-uint2 xor3(const uint2 a, const uint2 b, const uint2 c)
+uint2 xor3(uint2 a, uint2 b, uint2 c)
 {
 	return a ^ b ^ c;
 }
 
 __device__ __forceinline__
-uint2 chi(const uint2 a, const uint2 b, const uint2 c)
+uint2 chi(uint2 a, uint2 b, uint2 c)
 {
 	return a ^ (~b) & c;
 }
 
 __device__ __forceinline__
-void keccak_f1600_init(uint2* state)
+void keccak_f1600_init(uint2* s)
 {
-	uint2 s[25];
-	uint2 t[5], u, v;
-
-	s[4] = state[4];
+    uint2 t[5], u, v;
 
 	devectorize2(d_header.uint4s[0], s[0], s[1]);
 	devectorize2(d_header.uint4s[1], s[2], s[3]);
 
-	for (uint32_t i = 5; i < 25; ++i)
+	for(int i = 5;i < 25; ++i)
 	{
 		s[i] = make_uint2(0, 0);
 	}
@@ -162,7 +159,7 @@ void keccak_f1600_init(uint2* state)
 	/* iota: a[0,0] ^= round constant */
 	s[0] ^= vectorize(keccak_round_constants[0]);
 
-	for (int i = 1; i < 23; i++)
+	for(int i = 1;i < 23;++i)
 	{
 		/* theta: c = a[0,i] ^ a[1,i] ^ .. a[4,i] */
 		t[0] = xor5(s[0] , s[5] , s[10] , s[15] , s[20]);
@@ -336,23 +333,14 @@ void keccak_f1600_init(uint2* state)
 
 	/* iota: a[0,0] ^= round constant */
 	s[0] ^= vectorize(keccak_round_constants[23]);
-
-	for(int i = 0; i < 12; ++i)
-    {
-	    state[i] = s[i];
-    }
 }
 
 __device__ __forceinline__
-uint64_t keccak_f1600_final(uint2* state)
+uint64_t keccak_f1600_final(uint2* s)
 {
-	uint2 s[25];
-	uint2 t[5], u, v;
+    uint2 t[5], u, v;
 
-	for (int i = 0; i < 12; ++i)
-		s[i] = state[i];
-
-	for (uint32_t i = 12; i < 25; ++i)
+	for(int i = 12;i < 25;++i)
 	{
 		s[i] = make_uint2(0, 0);
 	}
@@ -472,7 +460,7 @@ uint64_t keccak_f1600_final(uint2* state)
 	/* iota: a[0,0] ^= round constant */
 	s[0] ^= vectorize(keccak_round_constants[0]);
 
-	for (int i = 1; i < 23; ++i)
+	for(int i = 1;i < 23;++i)
 	{
 		/* theta: c = a[0,i] ^ a[1,i] ^ .. a[4,i] */
 		t[0] = xor5(s[0], s[5], s[10], s[15], s[20]);
@@ -613,14 +601,14 @@ void SHA3_512(uint2* s)
 {
 	uint2 t[5], u, v;
 
-	for (uint32_t i = 8; i < 25; ++i)
+	for(int i = 8;i < 25;++i)
 	{
 		s[i] = make_uint2(0, 0);
 	}
 	s[8].x = 1;
 	s[8].y = 0x80000000;
 
-	for (int i = 0; i < 23; i++)
+	for(int i = 0;i < 23;++i)
 	{
 		/* theta: c = a[0,i] ^ a[1,i] ^ .. a[4,i] */
 		t[0] = xor5(s[0], s[5], s[10], s[15], s[20]);
