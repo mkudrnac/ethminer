@@ -25,37 +25,6 @@ uint64_t cuda_swab64(uint64_t x)
 	return result;
 }
 
-/*********************************************************************/
-// Macros to catch CUDA errors in CUDA runtime calls
-
-#define CUDA_SAFE_CALL(call)                                          \
-do {                                                                  \
-	cudaError_t err = call;                                           \
-	if (cudaSuccess != err) {                                         \
-		fprintf(stderr, "Cuda error in func '%s' at line %i : %s.\n", \
-		         __FUNCTION__, __LINE__, cudaGetErrorString(err) );   \
-		exit(EXIT_FAILURE);                                           \
-	}                                                                 \
-} while (0)
-
-#define CUDA_CALL_OR_RET(call) do {                                   \
-	cudaError_t err = call;                                           \
-	if (cudaSuccess != err) {                                         \
-		cudaReportHardwareFailure(thr_id, err, __FUNCTION__);         \
-		return;                                                       \
-	}                                                                 \
-} while (0)
-
-#define CUDA_CALL_OR_RET_X(call, ret) do {                            \
-	cudaError_t err = call;                                           \
-	if (cudaSuccess != err) {                                         \
-		cudaReportHardwareFailure(thr_id, err, __FUNCTION__);         \
-		return ret;                                                   \
-	}                                                                 \
-} while (0)
-
-/*********************************************************************/
-
 //MARK: uint2 ROTATE LEFT
 __device__ __forceinline__
 uint2 ROL2(const uint2 a, const int offset)
