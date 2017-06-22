@@ -126,7 +126,7 @@ void ethash_generate_dag(
 		printf("CUDA#%d: %.0f%%\n", device, 100.0f * (float)i / (float)fullRuns);
 	}
     
-	printf("GPU#%d 100%%\n", device);
+	printf("CUDA#%d 100%%\n", device);
 	CUDA_SAFE_CALL(cudaGetLastError());
 }
 
