@@ -86,12 +86,12 @@ uint64_t ROTL64(const uint64_t x, const unsigned int offset)
 {
     uint64_t result;
     asm("{\n\t"
-	".reg .b64 lhs;\n\t"
-	".reg .u32 roff;\n\t"
-	"shl.b64 lhs, %1, %2;\n\t"
-	"sub.u32 roff, 64, %2;\n\t"
-	"shr.b64 %0, %1, roff;\n\t"
-	"add.u64 %0, lhs, %0;\n\t"
+        ".reg .b64 lhs;\n\t"
+        ".reg .u32 roff;\n\t"
+        "shl.b64 lhs, %1, %2;\n\t"
+        "sub.u32 roff, 64, %2;\n\t"
+        "shr.b64 %0, %1, roff;\n\t"
+        "add.u64 %0, lhs, %0;\n\t"
     "}\n"
     : "=l"(result) : "l"(x), "r"(offset));
     return result;

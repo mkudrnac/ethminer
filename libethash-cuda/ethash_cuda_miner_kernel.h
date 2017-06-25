@@ -72,8 +72,7 @@ do {														\
 		fprintf(stderr,										\
 			"CUDA error in func '%s' at line %i : %s.\n",	\
 			__FUNCTION__, __LINE__, errorString);			\
-		/*throw std::runtime_error(errorString);*/			\
-        exit(EXIT_FAILURE);                                 \
+		throw std::runtime_error(errorString);              \
 	}														\
 } while (0)
 
