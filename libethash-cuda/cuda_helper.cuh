@@ -4,53 +4,6 @@
 #include <cuda.h>
 #include <cuda_runtime.h>
 
-//MARK: swab64
-// Input:       77665544 33221100
-// Output:      00112233 44556677
-__device__ __forceinline__
-uint64_t cuda_swab64(uint64_t x)
-{
-	uint64_t result;
-	uint2 t;
-	asm("mov.b64 {%0,%1},%2; \n\t"
-		: "=r"(t.x), "=r"(t.y) : "l"(x));
-	t.x = __byte_perm(t.x, 0, 0x0123);
-	t.y = __byte_perm(t.y, 0, 0x0123);
-	asm("mov.b64 %0,{%1,%2}; \n\t"
-		: "=l"(result) : "r"(t.y), "r"(t.x));
-	return result;
-}
-
-//MARK: uint2 ROTATE LEFT
-__device__ __forceinline__
-uint2 ROL2(uint2 x, unsigned int offset)
-{
-    uint2 result;
-    asm("{\n\t"
-        ".reg .b64 lhs;\n\t"
-        ".reg .u32 roff;\n\t"
-        "shl.b64 lhs, %1, %2;\n\t"
-        "sub.u32 roff, 64, %2;\n\t"
-        "shr.b64 %0, %1, roff;\n\t"
-        "add.u64 %0, lhs, %0;\n\t"
-        "}\n"
-        : "=l"(result) : "l"(x), "r"(offset));
-    return result;
-    
-//    uint2 result;
-//    if(shift >= 32)
-//    {
-//        result.x = __funnelshift_l(a.x, a.y, shift);
-//        result.y = __funnelshift_l(a.y, a.x, shift);
-//    }
-//    else
-//    {
-//        result.x = __funnelshift_l(a.y, a.x, shift);
-//        result.y = __funnelshift_l(a.x, a.y, shift);
-//    }
-//    return result;
-}
-
 //MARK: vectorize/devectorize
 __device__ __forceinline__
 uint64_t devectorize(uint2 x)
@@ -108,6 +61,61 @@ void devectorize4(uint4 inn, uint64_t &x, uint64_t &y)
 		: "=l"(x) : "r"(inn.x), "r"(inn.y));
 	asm("mov.b64 %0,{%1,%2}; \n\t"
 		: "=l"(y) : "r"(inn.z), "r"(inn.w));
+}
+
+//MARK: swab64
+// Input:       77665544 33221100
+// Output:      00112233 44556677
+__device__ __forceinline__
+uint64_t cuda_swab64(uint64_t x)
+{
+	uint64_t result;
+	uint2 t;
+	asm("mov.b64 {%0,%1},%2; \n\t"
+		: "=r"(t.x), "=r"(t.y) : "l"(x));
+	t.x = __byte_perm(t.x, 0, 0x0123);
+	t.y = __byte_perm(t.y, 0, 0x0123);
+	asm("mov.b64 %0,{%1,%2}; \n\t"
+		: "=l"(result) : "r"(t.y), "r"(t.x));
+	return result;
+}
+
+//MARK: uint64 ROTATE LEFT
+__device__ __forceinline__
+uint64_t ROTL64(const uint64_t x, const unsigned int offset)
+{
+    uint64_t result;
+    asm("{\n\t"
+	".reg .b64 lhs;\n\t"
+	".reg .u32 roff;\n\t"
+	"shl.b64 lhs, %1, %2;\n\t"
+	"sub.u32 roff, 64, %2;\n\t"
+	"shr.b64 %0, %1, roff;\n\t"
+	"add.u64 %0, lhs, %0;\n\t"
+    "}\n"
+    : "=l"(result) : "l"(x), "r"(offset));
+    return result;
+}
+
+//MARK: uint2 ROTATE LEFT
+__device__ __forceinline__
+uint2 ROL2(uint2 x, unsigned int offset)
+{
+    uint64_t x64 = devectorize(x);
+    return vectorize(ROTL64(x64, offset));
+    
+//    uint2 result;
+//    if(shift >= 32)
+//    {
+//        result.x = __funnelshift_l(a.x, a.y, shift);
+//        result.y = __funnelshift_l(a.y, a.x, shift);
+//    }
+//    else
+//    {
+//        result.x = __funnelshift_l(a.y, a.x, shift);
+//        result.y = __funnelshift_l(a.x, a.y, shift);
+//    }
+//    return result;
 }
 
 //MARK: uint2 operators
