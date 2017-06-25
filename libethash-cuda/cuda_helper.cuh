@@ -101,21 +101,7 @@ uint64_t ROTL64(uint64_t x, unsigned int offset)
 __device__ __forceinline__
 uint2 ROL2(uint2 x, unsigned int offset)
 {
-    uint64_t x64 = devectorize(x);
-    return vectorize(ROTL64(x64, offset));
-    
-//    uint2 result;
-//    if(shift >= 32)
-//    {
-//        result.x = __funnelshift_l(a.x, a.y, shift);
-//        result.y = __funnelshift_l(a.y, a.x, shift);
-//    }
-//    else
-//    {
-//        result.x = __funnelshift_l(a.y, a.x, shift);
-//        result.y = __funnelshift_l(a.x, a.y, shift);
-//    }
-//    return result;
+    return vectorize(ROTL64(devectorize(x), offset));
 }
 
 //MARK: uint2 operators
@@ -162,7 +148,7 @@ uint2 operator+ (uint2 a, uint2 b)
 	asm("{\n\t"
 		"add.cc.u32 %0,%2,%4; \n\t"
 		"addc.u32 %1,%3,%5;   \n\t"
-	"}\n\t"
+    "}\n\t"
 		: "=r"(result.x), "=r"(result.y) : "r"(a.x), "r"(a.y), "r"(b.x), "r"(b.y));
 	return result;
 }
@@ -174,7 +160,7 @@ uint2 operator+ (uint2 a, uint32_t b)
 	asm("{\n\t"
 		"add.cc.u32 %0,%2,%4; \n\t"
 		"addc.u32 %1,%3,%5;   \n\t"
-		"}\n\t"
+    "}\n\t"
 		: "=r"(result.x), "=r"(result.y) : "r"(a.x), "r"(a.y), "r"(b), "r"(0));
 	return result;
 }
@@ -186,7 +172,7 @@ uint2 operator- (uint2 a, uint32_t b)
 	asm("{\n\t"
 		"sub.cc.u32 %0,%2,%4; \n\t"
 		"subc.u32 %1,%3,%5;   \n\t"
-		"}\n\t"
+    "}\n\t"
 		: "=r"(result.x), "=r"(result.y) : "r"(a.x), "r"(a.y), "r"(b), "r"(0));
 	return result;
 }
@@ -198,7 +184,7 @@ uint2 operator- (uint2 a, uint2 b)
 	asm("{\n\t"
 		"sub.cc.u32 %0,%2,%4; \n\t"
 		"subc.u32 %1,%3,%5;   \n\t"
-		"}\n\t"
+    "}\n\t"
 		: "=r"(result.x), "=r"(result.y) : "r"(a.x), "r"(a.y), "r"(b.x), "r"(b.y));
 	return result;
 }
