@@ -1,3 +1,6 @@
+#ifndef DAGGER_SHUFFLED_H
+#define DAGGER_SHUFFLED_H
+
 #include "ethash_cuda_miner_kernel_globals.cuh"
 #include "ethash_cuda_miner_kernel.h"
 #include "cuda_helper.cuh"
@@ -90,3 +93,5 @@ uint64_t compute_hash(uint64_t nonce)
 	// keccak_256(keccak_512(header..nonce) .. mix);
 	return keccak_f1600_final(state);
 }
+
+#endif

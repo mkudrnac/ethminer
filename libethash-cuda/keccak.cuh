@@ -1,3 +1,6 @@
+#ifndef KECCAK_H
+#define KECCAK_H
+
 #include "cuda_helper.cuh"
 
 __device__ __constant__
@@ -37,6 +40,7 @@ void keccak_f1600_init(uint2* s)
 	devectorize2(d_header.uint4s[0], s[0], s[1]);
 	devectorize2(d_header.uint4s[1], s[2], s[3]);
 
+    #pragma unroll
 	for(int i = 5;i < 25;++i)
 	{
 		s[i] = make_uint2(0, 0);
@@ -206,7 +210,6 @@ void keccak_f1600_init(uint2* s)
 
 		/* rho pi: b[..] = rotl(a[..], ..) */
 		u = s[1];
-
 		s[1] = ROL2(s[6], 44);
 		s[6] = ROL2(s[9], 20);
 		s[9] = ROL2(s[22], 61);
@@ -337,6 +340,7 @@ uint64_t keccak_f1600_final(uint2* s)
 {
     uint2 t[5], u, v;
 
+    #pragma unroll
 	for(int i = 12;i < 25;++i)
 	{
 		s[i] = make_uint2(0, 0);
@@ -392,7 +396,6 @@ uint64_t keccak_f1600_final(uint2* s)
 
 	/* rho pi: b[..] = rotl(a[..], ..) */
 	u = s[1];
-
 	s[1] = ROL2(s[6], 44);
 	s[6] = ROL2(s[9], 20);
 	s[9] = ROL2(s[22], 61);
@@ -507,7 +510,6 @@ uint64_t keccak_f1600_final(uint2* s)
 
 		/* rho pi: b[..] = rotl(a[..], ..) */
 		u = s[1];
-
 		s[1] = ROL2(s[6], 44);
 		s[6] = ROL2(s[9], 20);
 		s[9] = ROL2(s[22], 61);
@@ -598,6 +600,7 @@ void SHA3_512(uint2* s)
 {
 	uint2 t[5], u, v;
 
+    #pragma unroll
 	for(int i = 8;i < 25;++i)
 	{
 		s[i] = make_uint2(0, 0);
@@ -779,3 +782,5 @@ void SHA3_512(uint2* s)
 	/* iota: a[0,0] ^= round constant */
 	s[0] ^= vectorize(keccak_round_constants[23]);
 }
+
+#endif

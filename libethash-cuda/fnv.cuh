@@ -1,3 +1,6 @@
+#ifndef FNV_H
+#define FNV_H
+
 /*
  *  https://en.wikipedia.org/wiki/Fowler–Noll–Vo_hash_function
  */
@@ -23,3 +26,5 @@ uint32_t fnv_reduce(const uint4 v)
 {
     return fnv(fnv(fnv(v.x, v.y), v.z), v.w);
 }
+
+#endif

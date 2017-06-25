@@ -23,20 +23,32 @@ uint64_t cuda_swab64(uint64_t x)
 
 //MARK: uint2 ROTATE LEFT
 __device__ __forceinline__
-uint2 ROL2(uint2 a, unsigned int shift)
+uint2 ROL2(uint2 x, unsigned int offset)
 {
     uint2 result;
-    if(shift >= 32)
-    {
-        result.x = __funnelshift_l(a.x, a.y, shift);
-        result.y = __funnelshift_l(a.y, a.x, shift);
-    }
-    else
-    {
-        result.x = __funnelshift_l(a.y, a.x, shift);
-        result.y = __funnelshift_l(a.x, a.y, shift);
-    }
+    asm("{\n\t"
+        ".reg .b64 lhs;\n\t"
+        ".reg .u32 roff;\n\t"
+        "shl.b64 lhs, %1, %2;\n\t"
+        "sub.u32 roff, 64, %2;\n\t"
+        "shr.b64 %0, %1, roff;\n\t"
+        "add.u64 %0, lhs, %0;\n\t"
+        "}\n"
+        : "=l"(result) : "l"(x), "r"(offset));
     return result;
+    
+//    uint2 result;
+//    if(shift >= 32)
+//    {
+//        result.x = __funnelshift_l(a.x, a.y, shift);
+//        result.y = __funnelshift_l(a.y, a.x, shift);
+//    }
+//    else
+//    {
+//        result.x = __funnelshift_l(a.y, a.x, shift);
+//        result.y = __funnelshift_l(a.x, a.y, shift);
+//    }
+//    return result;
 }
 
 //MARK: vectorize/devectorize

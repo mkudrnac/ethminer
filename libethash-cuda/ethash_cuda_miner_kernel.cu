@@ -22,7 +22,7 @@ ethash_search(
 {
 	uint32_t const gid = blockIdx.x * blockDim.x + threadIdx.x;	
 	uint64_t hash = compute_hash(start_nonce + gid);
-	if (cuda_swab64(hash) > d_target)
+	if(cuda_swab64(hash) > d_target)
     {
         return;
     }
