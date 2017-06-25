@@ -33,7 +33,7 @@ void devectorize2(uint4 inn, uint2 &x, uint2 &y)
 }
 
 __device__ __forceinline__
-uint4 vectorize2(uint2 x, const uint2 y)
+uint4 vectorize2(uint2 x, uint2 y)
 {
 	uint4 result;
 	result.x = x.x;
@@ -82,7 +82,7 @@ uint64_t cuda_swab64(uint64_t x)
 
 //MARK: uint64 ROTATE LEFT
 __device__ __forceinline__
-uint64_t ROTL64(const uint64_t x, const unsigned int offset)
+uint64_t ROTL64(uint64_t x, unsigned int offset)
 {
     uint64_t result;
     asm("{\n\t"
