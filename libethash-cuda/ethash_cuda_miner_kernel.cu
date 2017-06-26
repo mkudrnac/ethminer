@@ -43,6 +43,9 @@ void run_ethash_search(
 	CUDA_SAFE_CALL(cudaGetLastError());
 }
 
+#define ETHASH_DATASET_PARENTS 256
+#define NODE_WORDS (64 / 4)
+
 __global__ void
 ethash_calculate_dag_item(uint32_t start)
 {
