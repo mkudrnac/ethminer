@@ -9,6 +9,9 @@
 #define ACCESSES 64
 #define THREADS_PER_HASH (128 / 16)
 
+#define ETHASH_DATASET_PARENTS 256
+#define NODE_WORDS (64 / 4)
+
 typedef struct
 {
 	uint4 uint4s[32 / sizeof(uint4)];

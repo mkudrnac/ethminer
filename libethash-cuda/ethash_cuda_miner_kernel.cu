@@ -12,7 +12,7 @@
 #include "keccak.cuh"
 #include "dagger_shuffled.cuh"
 
-#define copy(dst, src, count) for (int i = 0; i != count; ++i) { (dst)[i] = (src)[i]; }
+#define copy(dst, src, count) for(int i = 0;i != count;++i) { (dst)[i] = (src)[i]; }
 
 __global__ void
 ethash_search(
@@ -42,9 +42,6 @@ void run_ethash_search(
 	ethash_search << <blocks, threads, sharedbytes, stream >> >(g_output, start_nonce);
 	CUDA_SAFE_CALL(cudaGetLastError());
 }
-
-#define ETHASH_DATASET_PARENTS 256
-#define NODE_WORDS (64/4)
 
 __global__ void
 ethash_calculate_dag_item(uint32_t start)

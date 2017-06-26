@@ -17,30 +17,36 @@ uint64_t compute_hash(uint64_t nonce)
 
 	keccak_f1600_init(state);
 	
-	// Threads work together in this phase in groups of 8.
+	//Threads work together in this phase in groups of 8.
 	const int thread_id     = threadIdx.x & (THREADS_PER_HASH - 1);
 	const int mix_idx       = thread_id & 3;
     const int shuffle_idx_1 = mix_idx * 2;
     const int shuffle_idx_2 = shuffle_idx_1 + 1;
 
+    //variables
+    uint2 shuffle[8];
+    uint4 mix[PARALLEL_HASH];
+    uint32_t offset[PARALLEL_HASH];
+    uint32_t init0[PARALLEL_HASH];
+    
+    //main loop
 	for(int i = 0;i < THREADS_PER_HASH;i += PARALLEL_HASH)
 	{
-		uint4 mix[PARALLEL_HASH];
-		uint32_t offset[PARALLEL_HASH];
-		uint32_t init0[PARALLEL_HASH];
-	
 		//share init among threads
 		for(int p = 0;p < PARALLEL_HASH;++p)
 		{
-			uint2 shuffle[8];
+            //share init among threads
+            #pragma unroll
 			for(int j = 0;j < 8;++j)
 			{
 				shuffle[j].x = __shfl(state[j].x, i + p, THREADS_PER_HASH);
 				shuffle[j].y = __shfl(state[j].y, i + p, THREADS_PER_HASH);
 			}
             
+            //mix
             mix[p] = vectorize2(shuffle[shuffle_idx_1], shuffle[shuffle_idx_2]);
             
+            //init0
 			init0[p] = __shfl(shuffle[0].x, 0, THREADS_PER_HASH);
 		}
 
@@ -57,12 +63,6 @@ uint64_t compute_hash(uint64_t nonce)
 					offset[p] = __shfl(offset[p], t, THREADS_PER_HASH);
                     mix[p] = fnv4(mix[p], d_dag[offset[p]].uint4s[thread_id]);
 				}
-                
-//				#pragma unroll
-//				for(int p = 0;p < PARALLEL_HASH;++p)
-//				{
-//					mix[p] = fnv4(mix[p], d_dag[offset[p]].uint4s[thread_id]);
-//				}
 			}
 		}
 
