@@ -195,10 +195,6 @@ void operator+= (uint2 &a, uint2 b)
     a = a + b;
 }
 
-/**
- * basic multiplication between 64bit no carry outside that range (ie mul.lo.b64(a*b))
- * (what does uint64 "*" operator)
- */
 __device__ __forceinline__
 uint2 operator* (uint2 a, uint2 b)
 {

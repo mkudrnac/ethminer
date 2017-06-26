@@ -35,8 +35,8 @@ uint64_t compute_hash(uint64_t nonce)
 			uint2 shuffle[8];
 			for(int j = 0;j < 8;++j)
 			{
-				shuffle[j].x = __shfl(state[j].x, i+p, THREADS_PER_HASH);
-				shuffle[j].y = __shfl(state[j].y, i+p, THREADS_PER_HASH);
+				shuffle[j].x = __shfl(state[j].x, i + p, THREADS_PER_HASH);
+				shuffle[j].y = __shfl(state[j].y, i + p, THREADS_PER_HASH);
 			}
             
             mix[p] = vectorize2(shuffle[shuffle_idx_1], shuffle[shuffle_idx_2]);
@@ -50,17 +50,19 @@ uint64_t compute_hash(uint64_t nonce)
 
 			for(uint32_t b = 0;b < 4;++b)
 			{
+                #pragma unroll
 				for(int p = 0;p < PARALLEL_HASH;++p)
 				{
-					offset[p] = fnv(init0[p] ^ (a + b), ((uint32_t *)&mix[p])[b]) % d_dag_size;
+					offset[p] = fnv(init0[p] ^ (a + b), ((uint32_t*)&mix[p])[b]) % d_dag_size;
 					offset[p] = __shfl(offset[p], t, THREADS_PER_HASH);
+                    mix[p] = fnv4(mix[p], d_dag[offset[p]].uint4s[thread_id]);
 				}
                 
-				#pragma unroll
-				for(int p = 0;p < PARALLEL_HASH;++p)
-				{
-					mix[p] = fnv4(mix[p], d_dag[offset[p]].uint4s[thread_id]);
-				}
+//				#pragma unroll
+//				for(int p = 0;p < PARALLEL_HASH;++p)
+//				{
+//					mix[p] = fnv4(mix[p], d_dag[offset[p]].uint4s[thread_id]);
+//				}
 			}
 		}
 
