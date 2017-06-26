@@ -10,7 +10,7 @@
 __device__
 uint64_t compute_hash(uint64_t nonce)
 {
-	// sha3_512(header .. nonce)
+	//sha3_512(header .. nonce)
 	uint2 state[25];
 	
 	state[4] = vectorize(nonce);
@@ -68,10 +68,9 @@ uint64_t compute_hash(uint64_t nonce)
 
 		for(int p = 0;p < PARALLEL_HASH;++p)
 		{
-			uint2 shuffle[4];
 			uint32_t thread_mix = fnv_reduce(mix[p]);
 
-			// update mix accross threads
+			//update mix accross threads
 			shuffle[0].x = __shfl(thread_mix, 0, THREADS_PER_HASH);
 			shuffle[0].y = __shfl(thread_mix, 1, THREADS_PER_HASH);
 			shuffle[1].x = __shfl(thread_mix, 2, THREADS_PER_HASH);
@@ -92,7 +91,7 @@ uint64_t compute_hash(uint64_t nonce)
 		}
 	}
 	
-	// keccak_256(keccak_512(header..nonce) .. mix);
+	//keccak_256(keccak_512(header..nonce) .. mix);
 	return keccak_f1600_final(state);
 }
 
