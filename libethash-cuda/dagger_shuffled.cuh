@@ -23,19 +23,18 @@ uint64_t compute_hash(uint64_t nonce)
     const int shuffle_idx_1 = mix_idx * 2;
     const int shuffle_idx_2 = shuffle_idx_1 + 1;
 
-    //variables
-    uint2 shuffle[8];
-    uint4 mix[PARALLEL_HASH];
-    uint32_t offset[PARALLEL_HASH];
-    uint32_t init0[PARALLEL_HASH];
-    
     //main loop
 	for(int i = 0;i < THREADS_PER_HASH;i += PARALLEL_HASH)
 	{
+		uint4 mix[PARALLEL_HASH];
+		uint32_t offset[PARALLEL_HASH];
+		uint32_t init0[PARALLEL_HASH];
+	
 		//share init among threads
 		for(int p = 0;p < PARALLEL_HASH;++p)
 		{
             //share init among threads
+            uint2 shuffle[8];
             #pragma unroll
 			for(int j = 0;j < 8;++j)
 			{
@@ -68,6 +67,7 @@ uint64_t compute_hash(uint64_t nonce)
 
 		for(int p = 0;p < PARALLEL_HASH;++p)
 		{
+            uint2 shuffle[4];
 			uint32_t thread_mix = fnv_reduce(mix[p]);
 
 			//update mix accross threads
