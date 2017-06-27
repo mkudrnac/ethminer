@@ -80,28 +80,22 @@ uint64_t cuda_swab64(uint64_t x)
 	return result;
 }
 
-//MARK: uint64 ROTATE LEFT
-__device__ __forceinline__
-uint64_t ROTL64(uint64_t x, unsigned int offset)
-{
-    uint64_t result;
-    asm("{\n\t"
-        ".reg .b64 lhs;\n\t"
-        ".reg .u32 roff;\n\t"
-        "shl.b64 lhs, %1, %2;\n\t"
-        "sub.u32 roff, 64, %2;\n\t"
-        "shr.b64 %0, %1, roff;\n\t"
-        "add.u64 %0, lhs, %0;\n\t"
-    "}\n"
-    : "=l"(result) : "l"(x), "r"(offset));
-    return result;
-}
-
 //MARK: uint2 ROTATE LEFT
 __device__ __forceinline__
-uint2 ROL2(uint2 x, unsigned int offset)
+uint2 ROL2(uint2 a, unsigned int offset)
 {
-    return vectorize(ROTL64(devectorize(x), offset));
+	uint2 result;
+	if(offset >= 32)
+	{
+		asm("shf.l.wrap.b32 %0, %1, %2, %3;" : "=r"(result.x) : "r"(a.x), "r"(a.y), "r"(offset));
+		asm("shf.l.wrap.b32 %0, %1, %2, %3;" : "=r"(result.y) : "r"(a.y), "r"(a.x), "r"(offset));
+	}
+	else
+	{
+		asm("shf.l.wrap.b32 %0, %1, %2, %3;" : "=r"(result.x) : "r"(a.y), "r"(a.x), "r"(offset));
+		asm("shf.l.wrap.b32 %0, %1, %2, %3;" : "=r"(result.y) : "r"(a.x), "r"(a.y), "r"(offset));
+	}
+	return result;
 }
 
 //MARK: uint2 operators

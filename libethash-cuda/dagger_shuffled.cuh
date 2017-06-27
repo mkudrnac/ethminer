@@ -5,7 +5,7 @@
 #include "ethash_cuda_miner_kernel.h"
 #include "cuda_helper.cuh"
 
-#define PARALLEL_HASH 4
+#define PARALLEL_HASH 8
 
 __device__
 uint64_t compute_hash(uint64_t nonce)
@@ -20,8 +20,6 @@ uint64_t compute_hash(uint64_t nonce)
 	//Threads work together in this phase in groups of 8.
 	const int thread_id     = threadIdx.x & (THREADS_PER_HASH - 1);
 	const int mix_idx       = thread_id & 3;
-    const int shuffle_idx_1 = mix_idx * 2;
-    const int shuffle_idx_2 = shuffle_idx_1 + 1;
 
     //main loop
 	for(int i = 0;i < THREADS_PER_HASH;i += PARALLEL_HASH)
@@ -35,7 +33,6 @@ uint64_t compute_hash(uint64_t nonce)
 		{
             //share init among threads
             uint2 shuffle[8];
-            #pragma unroll
 			for(int j = 0;j < 8;++j)
 			{
 				shuffle[j].x = __shfl(state[j].x, i + p, THREADS_PER_HASH);
@@ -43,7 +40,13 @@ uint64_t compute_hash(uint64_t nonce)
 			}
             
             //mix
-            mix[p] = vectorize2(shuffle[shuffle_idx_1], shuffle[shuffle_idx_2]);
+			switch (mix_idx)
+			{
+			case 0: mix[p] = vectorize2(shuffle[0], shuffle[1]); break;
+			case 1: mix[p] = vectorize2(shuffle[2], shuffle[3]); break;
+			case 2: mix[p] = vectorize2(shuffle[4], shuffle[5]); break;
+			case 3: mix[p] = vectorize2(shuffle[6], shuffle[7]); break;
+			}
             
             //init0
 			init0[p] = __shfl(shuffle[0].x, 0, THREADS_PER_HASH);
@@ -55,12 +58,16 @@ uint64_t compute_hash(uint64_t nonce)
 
 			for(uint32_t b = 0;b < 4;++b)
 			{
-                #pragma unroll
 				for(int p = 0;p < PARALLEL_HASH;++p)
 				{
 					offset[p] = fnv(init0[p] ^ (a + b), ((uint32_t*)&mix[p])[b]) % d_dag_size;
 					offset[p] = __shfl(offset[p], t, THREADS_PER_HASH);
-                    mix[p] = fnv4(mix[p], d_dag[offset[p]].uint4s[thread_id]);
+				}
+
+				#pragma unroll
+				for(int p = 0;p < PARALLEL_HASH;++p)
+				{
+					mix[p] = fnv4(mix[p], d_dag[offset[p]].uint4s[thread_id]);
 				}
 			}
 		}
