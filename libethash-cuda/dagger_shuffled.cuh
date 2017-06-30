@@ -52,11 +52,11 @@ uint64_t compute_hash(uint64_t nonce)
 			init0[p] = __shfl(shuffle[0].x, 0, THREADS_PER_HASH);
 		}
 
-		for(uint32_t a = 0;a < ACCESSES;a += 4)
+		for(int a = 0;a < ACCESSES;a += 4)
 		{
 			int t = bfe(a, 2u, 3u);
 
-			for(uint32_t b = 0;b < 4;++b)
+			for(int b = 0;b < 4;++b)
 			{
 				for(int p = 0;p < PARALLEL_HASH;++p)
 				{
