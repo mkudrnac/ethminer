@@ -1,6 +1,5 @@
-#pragma once
-
-//#include <cuda_runtime.h>
+#ifndef _ETHASH_CUDA_MINER_H_
+#define _ETHASH_CUDA_MINER_H_
 
 #include <time.h>
 #include <functional>
@@ -73,3 +72,5 @@ private:
 	/// User can set it via the --cl-extragpu-mem argument.
 	static unsigned s_extraRequiredGPUMem;
 };
+
+#endif

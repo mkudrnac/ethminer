@@ -64,6 +64,7 @@ void ethash_generate_dag(
 	);
 
 
+#ifndef CUDA_SAFE_CALL
 #define CUDA_SAFE_CALL(call)								\
 do {														\
 	cudaError_t err = call;									\
@@ -72,8 +73,9 @@ do {														\
 		fprintf(stderr,										\
 			"CUDA error in func '%s' at line %i : %s.\n",	\
 			__FUNCTION__, __LINE__, errorString);			\
-		throw std::runtime_error(errorString);              \
+		::exit(EXIT_FAILURE);                               \
 	}														\
 } while (0)
+#endif
 
 #endif

@@ -33,7 +33,6 @@
 #include <thread>
 #include <libethash/ethash.h>
 #include <libethash/internal.h>
-#include <cuda_runtime.h>
 #include "ethash_cuda_miner.h"
 
 

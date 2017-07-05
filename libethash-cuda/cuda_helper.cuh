@@ -256,15 +256,4 @@ uint32_t bfe(uint32_t x, uint32_t bit, uint32_t numBits)
 
 }
 
-//MARK: Macros to catch CUDA errors in CUDA runtime calls
-#define CUDA_SAFE_CALL(call)                                          \
-do {                                                                  \
-	cudaError_t err = call;                                           \
-	if (cudaSuccess != err) {                                         \
-		fprintf(stderr, "Cuda error in func '%s' at line %i : %s.\n", \
-		         __FUNCTION__, __LINE__, cudaGetErrorString(err) );   \
-		exit(EXIT_FAILURE);                                           \
-	}                                                                 \
-} while (0)
-
 #endif // #ifndef CUDA_HELPER_H
