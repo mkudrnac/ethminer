@@ -37,9 +37,12 @@
 
 
 // workaround lame platforms
-
-#undef min
-#undef max
+#ifdef min
+    #undef min
+#endif
+#ifdef max
+    #undef max
+#endif
 
 using namespace std;
 
@@ -66,8 +69,28 @@ static std::atomic_flag s_logSpin = ATOMIC_FLAG_INIT;
 
 ethash_cuda_miner::search_hook::~search_hook() {}
 
-ethash_cuda_miner::ethash_cuda_miner()
+ethash_cuda_miner::ethash_cuda_miner() :
+m_current_header{},
+m_current_target(0),
+m_current_nonce(0),
+m_starting_nonce(0),
+m_current_index(0),
+m_sharedBytes(0),
+m_search_buf(nullptr),
+m_streams(nullptr)
 {
+    
+}
+
+ethash_cuda_miner::~ethash_cuda_miner()
+{
+    for(unsigned i = 0;i != s_numStreams;++i)
+    {
+        CUDA_SAFE_CALL(cudaFreeHost((void*)m_search_buf[i]));
+        CUDA_SAFE_CALL(cudaStreamDestroy(m_streams[i]));
+    }
+    delete [] m_search_buf;
+    delete [] m_streams;
 }
 
 std::string ethash_cuda_miner::platform_info(unsigned _deviceId)

@@ -36,7 +36,7 @@ namespace eth
 {
 class EthashCUDAHook;
 
-	class EthashCUDAMiner : public Miner, Worker
+	class EthashCUDAMiner final : public Miner, Worker
 	{
 		friend class dev::eth::EthashCUDAHook;
 

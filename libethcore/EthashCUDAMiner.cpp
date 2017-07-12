@@ -112,6 +112,7 @@ Miner(_ci),
 Worker("cudaminer" + toString(index())),
 m_hook(new EthashCUDAHook(this))
 {
+    
 }
 
 EthashCUDAMiner::~EthashCUDAMiner()
@@ -173,14 +174,12 @@ void EthashCUDAMiner::workLoop()
 			cnote << "Initialising miner...";
 			m_minerSeed = w.seedHash;
 
-			delete m_miner;
-			m_miner = new ethash_cuda_miner();
-
-			EthashAux::LightType light;
-			light = EthashAux::light(w.seedHash);
-			//bytesConstRef dagData = dag->data();
+			EthashAux::LightType light = EthashAux::light(w.seedHash);
 			bytesConstRef lightData = light->data();
-			
+
+            delete m_miner;
+            m_miner = new ethash_cuda_miner();
+            
 			m_miner->init(light->light, lightData.data(), lightData.size(), device, (s_dagLoadMode == DAG_LOAD_MODE_SINGLE), &s_dagInHostMemory);
 			s_dagLoadIndex++;
 

@@ -6,7 +6,7 @@
 #include <libethash/ethash.h>
 #include "ethash_cuda_miner_kernel.h"
 
-class ethash_cuda_miner
+class ethash_cuda_miner final
 {
 public:
 	struct search_hook
@@ -20,6 +20,7 @@ public:
 
 public:
 	ethash_cuda_miner();
+    ~ethash_cuda_miner();
 
 	static std::string platform_info(unsigned _deviceId = 0);
 	static int getNumDevices();
