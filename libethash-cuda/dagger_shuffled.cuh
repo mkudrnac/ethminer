@@ -25,8 +25,8 @@ uint64_t compute_hash(uint64_t nonce)
 	for(int i = 0;i < THREADS_PER_HASH;i += PARALLEL_HASH)
 	{
 		uint4 mix[PARALLEL_HASH];
-        uint32_t offset;
-		uint32_t init0;
+        uint32_t offset[PARALLEL_HASH];
+		uint32_t init0[PARALLEL_HASH];
 	
 		//share init among threads
 		for(int p = 0;p < PARALLEL_HASH;++p)
@@ -49,22 +49,26 @@ uint64_t compute_hash(uint64_t nonce)
 			}
             
             //init0
-			init0 = __shfl(shuffle[0].x, 0, THREADS_PER_HASH);
+			init0[p] = __shfl(shuffle[0].x, 0, THREADS_PER_HASH);
 		}
 
 		for(int a = 0;a < ACCESSES;a += 4)
 		{
 			int t = bfe(a, 2u, 3u);
 
-            #pragma unroll
 			for(int b = 0;b < 4;++b)
 			{
                 for(int p = 0;p < PARALLEL_HASH;++p)
                 {
-                    offset = fnv(init0 ^ (a + b), ((uint32_t*)&mix[p])[b]) % d_dag_size;
-                    offset = __shfl(offset, t, THREADS_PER_HASH);
-                    mix[p] = fnv4(mix[p], d_dag[offset].uint4s[thread_id]);
+                    offset[p] = fnv(init0[p] ^ (a + b), ((uint32_t*)&mix[p])[b]) % d_dag_size;
+                    offset[p] = __shfl(offset[p], t, THREADS_PER_HASH);
                 }
+                
+                #pragma unroll
+                for(int p = 0;p < PARALLEL_HASH;++p)
+                {
+                    mix[p] = fnv4(mix[p], d_dag[offset[p]].uint4s[thread_id]);
+                }                
 			}
 		}
 
