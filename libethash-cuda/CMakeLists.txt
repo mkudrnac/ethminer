@@ -3,7 +3,7 @@ find_package(CUDA REQUIRED)
 set(CUDA_NVCC_FLAGS "${CUDA_NVCC_FLAGS} -O3")
 set(CUDA_NVCC_FLAGS "${CUDA_NVCC_FLAGS} -use_fast_math")
 set(CUDA_NVCC_FLAGS "${CUDA_NVCC_FLAGS} -std=c++11")
-set(CUDA_NVCC_FLAGS "${CUDA_NVCC_FLAGS} --ptxas-options=-v")
+set(CUDA_NVCC_FLAGS "${CUDA_NVCC_FLAGS} --ptxas-options=-v,-dlcm=ca")
 
 list(APPEND CUDA_NVCC_FLAGS -gencode arch=compute_61,code=sm_61)
 

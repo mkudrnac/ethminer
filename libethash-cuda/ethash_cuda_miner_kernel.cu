@@ -39,7 +39,7 @@ void run_ethash_search(
 	uint64_t start_nonce
 )
 {
-	ethash_search << <1024, 32, sharedbytes, stream >> >(g_output, start_nonce);
+	ethash_search << <blocks, threads, sharedbytes, stream >> >(g_output, start_nonce);
 	CUDA_SAFE_CALL(cudaGetLastError());
 }
 
