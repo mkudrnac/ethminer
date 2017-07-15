@@ -4,7 +4,7 @@
 #include "ethash.h"
 #include <stdio.h>
 
-#define ENABLE_SSE 0
+#define ENABLE_SSE 1
 
 #if defined(_M_X64) && ENABLE_SSE
 #include <smmintrin.h>
