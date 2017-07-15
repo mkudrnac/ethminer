@@ -177,6 +177,7 @@ void EthashCUDAMiner::workLoop()
 			EthashAux::LightType light = EthashAux::light(w.seedHash);
 			bytesConstRef lightData = light->data();
 
+            //recreate miner
             delete m_miner;
             m_miner = new ethash_cuda_miner();
             

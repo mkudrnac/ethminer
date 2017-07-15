@@ -84,25 +84,18 @@ m_streams(nullptr)
 
 ethash_cuda_miner::~ethash_cuda_miner()
 {
-    for(unsigned i = 0;i != s_numStreams;++i)
-    {
-        CUDA_SAFE_CALL(cudaFreeHost((void*)m_search_buf[i]));
-        CUDA_SAFE_CALL(cudaStreamDestroy(m_streams[i]));
-    }
+    finish();
     delete [] m_search_buf;
     delete [] m_streams;
 }
 
 std::string ethash_cuda_miner::platform_info(unsigned _deviceId)
 {
-	int runtime_version;
-	int device_count;
-
-	device_count = getNumDevices();
-
+	int device_count = getNumDevices();
 	if (device_count == 0)
 		return std::string();
 
+    int runtime_version;
 	CUDA_SAFE_CALL(cudaRuntimeGetVersion(&runtime_version));
 
 	// use selected default device
@@ -111,12 +104,12 @@ std::string ethash_cuda_miner::platform_info(unsigned _deviceId)
 
 	CUDA_SAFE_CALL(cudaGetDeviceProperties(&device_props, device_num));
 
-	char platform[5];
+	char platform[16];
 	int version_major = runtime_version / 1000;
 	int version_minor = (runtime_version - (version_major * 1000)) / 10;
 	sprintf(platform, "%d.%d", version_major, version_minor);
 
-	char compute[5];
+	char compute[16];
 	sprintf(compute, "%d.%d", device_props.major, device_props.minor);
 
 	return "{ \"platform\": \"CUDA " + std::string(platform) + "\", \"device\": \"" + std::string(device_props.name) + "\", \"version\": \"Compute " + std::string(compute) + "\" }";
@@ -240,7 +233,6 @@ bool ethash_cuda_miner::init(ethash_light_t _light, uint8_t const* _lightData, u
 	try
 	{
 		int device_count = getNumDevices();
-
 		if (device_count == 0)
 			return false;
 
